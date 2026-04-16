@@ -1,0 +1,39 @@
+Dataset ready: (10256, 4)
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████| 148/148 [00:00<00:00, 1647.50it/s, Materializing param=transformer.wte.weight]
+GPT2LMHeadModel LOAD REPORT from: gpt2
+Key                  | Status     |  | 
+---------------------+------------+--+-
+h.{0...11}.attn.bias | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED    :can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+GPT-2 loaded on: cuda
+  0%|                                                                                                                                                                            | 0/10 [00:00<?, ?it/s]Token indices sequence length is longer than the specified maximum sequence length for this model (1025 > 1024). Running this sequence through the model will result in indexing errors
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 10/10 [20:47<00:00, 124.74s/it]
+GPT-2 surprisal computed
+After cleaning: (7062, 5)
+   item  zone  word          RT gpt2_surprisal
+0     1     2   you  369.011905       9.356252
+1     1     3  were  368.183908      14.616378
+2     1     4    to  344.318182      12.711992
+3     1     6    to  349.674157      11.276607
+4     1     7   the  376.370787      11.655377
+Pearson: -0.08865241041437857
+Spearman: -0.0719605401765992
+Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [beta, intercept, sigma]
+                                                                                                                                  
+  Progress                                   Draw   Divergences   Step size   Grad evals   Speed             Elapsed   Remaining  
+ ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   3000   0             1.165       1            997.61 draws/s    0:00:03   0:00:00    
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   3000   0             1.091       3            1020.32 draws/s   0:00:02   0:00:00    
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   3000   0             1.227       3            954.55 draws/s    0:00:03   0:00:00    
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   3000   0             1.133       3            984.77 draws/s    0:00:03   0:00:00    
+                                                                                                                                  
+Sampling 4 chains for 1_000 tune and 2_000 draw iterations (4_000 + 8_000 draws total) took 3 seconds.
+            mean     sd  hdi_3%  hdi_97%  mcse_mean  mcse_sd  ess_bulk  ess_tail  r_hat
+beta      -0.089  0.012  -0.111   -0.067        0.0      0.0   12496.0    6655.0    1.0
+intercept -0.000  0.012  -0.022    0.022        0.0      0.0   11699.0    6006.0    1.0
+sigma      0.996  0.008   0.981    1.013        0.0      0.0   12536.0    6279.0    1.0
