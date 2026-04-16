@@ -27,7 +27,7 @@ df_avg = df.groupby(["item", "zone", "word"])["RT"].mean().reset_index()
 df_avg = df_avg[df_avg["RT"] > 0]
 df_avg = df_avg.sort_values(by=["item", "zone"]).reset_index(drop=True)
 
-print("Dataset ready:", df_avg.shape)
+print("Dataset ready:", df_avg.shape) 
 
 # =====================================
 # STEP 2: LOAD GPT-2
@@ -45,39 +45,60 @@ print("GPT-2 loaded on:", device)
 # STEP 3: FUNCTION TO COMPUTE SURPRISAL
 # =====================================
 def compute_surprisal_for_sentence(words_list):
+    """
+    Revised to handle sub-word tokenization and 1024-token limit 
+    more gracefully to avoid the indexing errors seen in logs. 
+    """
     surprisals = []
-
-    for i in range(1, len(words_list)):
+    
+    # Pre-tokenize the whole sentence to ensure alignment
+    full_text = " ".join(words_list)
+    
+    for i in range(len(words_list)):
+        if i == 0:
+            surprisals.append(None) # No context for the first word
+            continue
+            
+        # Context is everything before the current word
         context = " ".join(words_list[:i])
-        target = words_list[i]
+        target = " " + words_list[i] # GPT-2 expects a leading space for mid-sentence words
 
-        # Tokenize FULL context
-        inputs = tokenizer(context, return_tensors="pt")
-        
-        # 🔥 FIX: truncate to last 1024 tokens
-        if inputs["input_ids"].shape[1] > 1024:
-            inputs["input_ids"] = inputs["input_ids"][:, -1024:]
-            inputs["attention_mask"] = inputs["attention_mask"][:, -1024:]
-
-        inputs = {k: v.to(device) for k, v in inputs.items()}
-
-        with torch.no_grad():
-            outputs = model(**inputs)
-            logits = outputs.logits
-
-        probs = torch.softmax(logits[0, -1], dim=0)
-
+        # Encode context and target
+        context_ids = tokenizer.encode(context, add_special_tokens=False)
         target_ids = tokenizer.encode(target, add_special_tokens=False)
 
-        if len(target_ids) == 1:
-            prob = probs[target_ids[0]].item()
-            surprisal = -math.log(prob)
-        else:
-            surprisal = None
+        # Truncate context to fit within the 1024 limit 
+        # We leave room for the target tokens
+        max_context = 1024 - len(target_ids)
+        if len(context_ids) > max_context:
+            context_ids = context_ids[-max_context:]
 
-        surprisals.append(surprisal)
+        input_ids = torch.tensor([context_ids]).to(device)
 
-    surprisals.insert(0, None)
+        with torch.no_grad():
+            outputs = model(input_ids)
+            logits = outputs.logits # Shape: [1, seq_len, vocab_size]
+
+        # Get the logits for the very last token of the context to predict target
+        last_token_logits = logits[0, -1, :]
+        log_probs = torch.log_softmax(last_token_logits, dim=0)
+
+        # If word is split into multiple tokens, surprisal = sum of individual surprisals
+        # based on the chain rule: P(w1, w2) = P(w1) * P(w2|w1)
+        word_surprisal = 0.0
+        temp_context_ids = list(context_ids)
+
+        for t_id in target_ids:
+            input_ids = torch.tensor([temp_context_ids]).to(device)
+            with torch.no_grad():
+                outputs = model(input_ids)
+                log_probs = torch.log_softmax(outputs.logits[0, -1, :], dim=0)
+            
+            word_surprisal += -log_probs[t_id].item()
+            temp_context_ids.append(t_id) # Update context for multi-token words
+
+        surprisals.append(word_surprisal)
+
     return surprisals
 
 # =====================================
@@ -88,9 +109,8 @@ df_avg["gpt2_surprisal"] = None
 grouped = df_avg.groupby("item")
 
 for item_id, group in tqdm(grouped):
-    words_list = group["word"].tolist()
+    words_list = group["word"].astype(str).tolist()
     surprisals = compute_surprisal_for_sentence(words_list)
-
     df_avg.loc[group.index, "gpt2_surprisal"] = surprisals
 
 print("GPT-2 surprisal computed")
@@ -99,17 +119,15 @@ print("GPT-2 surprisal computed")
 # STEP 5: CLEAN
 # =====================================
 df_clean = df_avg.dropna().reset_index(drop=True)
+df_clean["gpt2_surprisal"] = pd.to_numeric(df_clean["gpt2_surprisal"], errors="coerce")
+df_clean = df_clean.dropna()
 
 print("After cleaning:", df_clean.shape)
-
-print(df_clean.head())
 
 # =====================================
 # STEP 6: SAVE
 # =====================================
 df_clean.to_csv("gpt2_surprisal.csv", index=False)
-df_clean["gpt2_surprisal"] = pd.to_numeric(df_clean["gpt2_surprisal"], errors="coerce")
-df_clean = df_clean.dropna()
 
 # =====================================
 # STEP 7: CORRELATION
@@ -117,13 +135,13 @@ df_clean = df_clean.dropna()
 pearson_corr, p_val = pearsonr(df_clean["gpt2_surprisal"], df_clean["RT"])
 spearman_corr, _ = spearmanr(df_clean["gpt2_surprisal"], df_clean["RT"])
 
-print("Pearson:", pearson_corr)
-print("Spearman:", spearman_corr)
+print(f"Pearson: {pearson_corr:.4f} (p={p_val:.4f})")
+print(f"Spearman: {spearman_corr:.4f}")
 
 # =====================================
 # STEP 8: PLOT
 # =====================================
-plt.figure()
+plt.figure(figsize=(10, 6))
 plt.scatter(df_clean["gpt2_surprisal"], df_clean["RT"], alpha=0.3)
 plt.xlabel("GPT-2 Surprisal")
 plt.ylabel("Reading Time")
@@ -135,24 +153,20 @@ plt.show()
 # =====================================
 data = df_clean.copy()
 
+# Standardize features
 X = (data["gpt2_surprisal"] - data["gpt2_surprisal"].mean()) / data["gpt2_surprisal"].std()
 Y = (data["RT"] - data["RT"].mean()) / data["RT"].std()
 
-X = X.values
-Y = Y.values
-
-with pm.Model() as model:
-
+with pm.Model() as bayes_model:
     beta = pm.Normal("beta", 0, 1)
     intercept = pm.Normal("intercept", 0, 1)
     sigma = pm.HalfNormal("sigma", 1)
 
-    mu = intercept + beta * X
+    mu = intercept + beta * X.values
+    y_obs = pm.Normal("y_obs", mu=mu, sigma=sigma, observed=Y.values)
 
-    y_obs = pm.Normal("y_obs", mu=mu, sigma=sigma, observed=Y)
+    trace = pm.sample(2000, tune=1000, return_inferencedata=True, target_accept=0.9) 
 
-    trace = pm.sample(2000, tune=1000, return_inferencedata=True)
-
-print(az.summary(trace))
-
+print(az.summary(trace)) 
 az.plot_posterior(trace)
+plt.show()
