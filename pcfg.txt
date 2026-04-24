@@ -2,7 +2,7 @@
 [nltk_data]     bharti/nltk_data...
 [nltk_data]   Package treebank is already up-to-date!
 Computing PCFG: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 10/10 [00:38<00:00,  3.81s/it]
-Corrected PCFG Pearson: 0.0611 (p=0.8429)
+PCFG - Pearson: 0.0611, Spearman: 0.0772
 Initializing NUTS using jitter+adapt_diag...
 Multiprocess sampling (4 chains in 4 jobs)
 NUTS: [beta, intercept, sigma]
