@@ -101,6 +101,39 @@ def compute_surprisal_for_sentence(words_list):
 
     return surprisals
 
+# def compute_surprisal_for_sentence(words_list):
+#     surprisals = []
+#     # Using a sliding window approach to avoid the 1024 truncation 
+#     for i in range(len(words_list)):
+#         if i == 0:
+#             surprisals.append(np.nan)
+#             continue
+            
+#         # Context window: Max 512 tokens to stay safe within GPT-2 limits
+#         context = " ".join(words_list[max(0, i-50):i]) 
+#         target = " " + words_list[i]
+        
+#         inputs = tokenizer(context, return_tensors="pt").to(device)
+#         target_ids = tokenizer.encode(target, add_special_tokens=False)
+        
+#         word_surprisal = 0.0
+#         curr_input_ids = inputs["input_ids"]
+        
+#         for t_id in target_ids:
+#             with torch.no_grad():
+#                 outputs = model(curr_input_ids)
+#                 # Proper log_softmax to get surprisal [cite: 23]
+#                 log_probs = torch.log_softmax(outputs.logits[0, -1, :], dim=0)
+#                 word_surprisal += -log_probs[t_id].item()
+#                 # Append for multi-token word chain rule: P(w1,w2|ctx) = P(w1|ctx)P(w2|ctx,w1)
+#                 curr_input_ids = torch.cat([curr_input_ids, torch.tensor([[t_id]]).to(device)], dim=1)
+        
+#         surprisals.append(word_surprisal)
+#     return surprisals
+
+# FIX: Log-transform RT before Bayesian analysis for normality 
+df_avg["log_RT"] = np.log(df_avg["RT"])
+
 # =====================================
 # STEP 4: APPLY TO DATA
 # =====================================

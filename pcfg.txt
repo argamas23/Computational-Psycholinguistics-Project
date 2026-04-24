@@ -1,0 +1,21 @@
+[nltk_data] Downloading package treebank to /home/samagra-
+[nltk_data]     bharti/nltk_data...
+[nltk_data]   Package treebank is already up-to-date!
+Computing PCFG: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 10/10 [00:38<00:00,  3.81s/it]
+Corrected PCFG Pearson: 0.0611 (p=0.8429)
+Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [beta, intercept, sigma]
+                                                                                                                                  
+  Progress                                   Draw   Divergences   Step size   Grad evals   Speed             Elapsed   Remaining  
+ ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   2000   0             1.138       3            3451.19 draws/s   0:00:00   0:00:00    
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   2000   0             1.059       3            3783.18 draws/s   0:00:00   0:00:00    
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   2000   0             0.822       3            3260.45 draws/s   0:00:00   0:00:00    
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   2000   0             0.817       7            2919.96 draws/s   0:00:00   0:00:00    
+                                                                                                                                  
+Sampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 1 seconds.
+            mean     sd  hdi_3%  hdi_97%  mcse_mean  mcse_sd  ess_bulk  ess_tail  r_hat
+beta       0.056  0.308  -0.490    0.674      0.005    0.005    4479.0    2657.0    1.0
+intercept -0.000  0.298  -0.572    0.542      0.005    0.005    3902.0    2646.0    1.0
+sigma      1.091  0.234   0.735    1.555      0.004    0.005    2922.0    2448.0    1.0
