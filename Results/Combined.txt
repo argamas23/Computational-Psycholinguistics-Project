@@ -1,0 +1,29 @@
+Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [beta_surp, beta_loc, intercept, sigma]
+                                                                                                                                  
+  Progress                                   Draw   Divergences   Step size   Grad evals   Speed             Elapsed   Remaining  
+ ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   3000   0             1.036       3            1070.85 draws/s   0:00:02   0:00:00    
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   3000   0             0.885       3            1084.76 draws/s   0:00:02   0:00:00    
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   3000   0             1.035       3            1202.74 draws/s   0:00:02   0:00:00    
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   3000   0             1.038       3            1190.31 draws/s   0:00:02   0:00:00    
+                                                                                                                                  
+Sampling 4 chains for 1_000 tune and 2_000 draw iterations (4_000 + 8_000 draws total) took 3 seconds.
+            mean     sd  hdi_2.5%  hdi_97.5%  mcse_mean  mcse_sd  ess_bulk  ess_tail  r_hat
+beta_surp  0.238  0.009     0.221      0.255        0.0      0.0   11565.0    5999.0    1.0
+beta_loc  -0.433  0.009    -0.449     -0.416        0.0      0.0   13319.0    6707.0    1.0
+intercept  0.000  0.009    -0.017      0.016        0.0      0.0   14166.0    6595.0    1.0
+sigma      0.870  0.006     0.858      0.882        0.0      0.0   13569.0    6333.0    1.0
+--- Error Analysis: Top 10 Difficult Words ---
+                     word  gpt2_surprisal    log_RT     error
+8660               years.        5.660709  6.772066  8.471779
+8309                tulip        7.089891  6.684828  7.573270
+8308        thirty-seven,       16.132424  6.759384  7.524738
+5195              bones?'       10.829632  6.685050  7.277805
+4183         hedge-king!'        2.975376  6.520055  6.418195
+7892              claims,        2.445083  6.464134  5.957295
+9339          noblewoman.       12.577720  6.543612  5.866331
+7320         forty-seven.        9.615927  6.480110  5.530637
+2091                  air        4.980031  6.438973  5.529307
+9337  eighty-six-year-old       16.468129  6.532867  5.460214
